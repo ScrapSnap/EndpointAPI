@@ -1,0 +1,68 @@
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+import { UserDto } from './dto/user.dto';
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
+import { User } from './schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import * as brcypt from 'bcrypt';
+import { AuthGuard } from '../auth/auth.guard';
+
+@Controller('users')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
+
+  @UseGuards(AuthGuard)
+  @Post()
+  @ApiOperation({ summary: 'Create user' })
+  @ApiOkResponse({ type: UserDto })
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  async createUser(@Body() body: CreateUserDto): Promise<UserDto> {
+    if (!body) {
+      throw new BadRequestException('User data is required.');
+    }
+
+    const existingUser = await this.userService.getUserByUsername(
+      body.username,
+    );
+    if (existingUser) {
+      throw new BadRequestException('Username already exists.');
+    }
+
+    const user = new User();
+    user.firstname = body.firstname;
+    user.lastname = body.lastname;
+    user.username = body.username;
+    user.password = await brcypt.hash(body.password, 10);
+    user.createdAt = new Date().toISOString();
+    user.updatedAt = new Date().toISOString();
+
+    const createdUser = await this.userService.createUser(user);
+    console.log('createdUser', new UserDto(createdUser));
+    return new UserDto(createdUser);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('/:id')
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiOkResponse({ type: UserDto })
+  @ApiNotFoundResponse()
+  async getUserById(@Param('id') id: string): Promise<UserDto> {
+    const user = await this.userService.getUserById(id);
+    return new UserDto(user);
+  }
+}

@@ -1,0 +1,31 @@
+import { ApiResponseProperty } from '@nestjs/swagger';
+import { User } from '../schemas/user.schema';
+
+export class UserDto {
+  @ApiResponseProperty()
+  _id: string;
+
+  @ApiResponseProperty()
+  createdAt: string;
+
+  @ApiResponseProperty()
+  firstname: string;
+
+  @ApiResponseProperty()
+  lastname: string;
+
+  @ApiResponseProperty()
+  updatedAt: string;
+
+  @ApiResponseProperty()
+  username: string;
+
+  constructor(args?: Partial<User | UserDto>) {
+    this._id = args._id;
+    this.createdAt = args.createdAt;
+    this.firstname = args.firstname;
+    this.lastname = args.lastname;
+    this.updatedAt = args.updatedAt;
+    this.username = args.username;
+  }
+}
