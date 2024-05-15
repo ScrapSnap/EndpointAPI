@@ -15,19 +15,19 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  async login(@Body() body: LoginUserDto): Promise<{ token: string }> {
+  async login(@Body() body: LoginUserDto): Promise<{ token: string, user: UserDto }> {
     if (!body) {
       throw new BadRequestException('Username and password are required');
     }
 
     const { email, password } = body;
-    const token = await this.authService.loginUser(email, password);
+    const { token, user } = await this.authService.loginUser(email, password);
 
-    if (!token) {
+    if (!token || !user) {
       throw new UnauthorizedException('Invalid username or password');
     }
 
-    return { token };
+    return { token, user };
   }
 
   @Post('register')
