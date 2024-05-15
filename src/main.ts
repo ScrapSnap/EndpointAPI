@@ -7,12 +7,13 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors()
 
   const config = new DocumentBuilder()
-    .setTitle('UsersAPI')
+    .setTitle('EndpointAPI')
     .setDescription('API for user management')
     .setVersion('0.0.1')
-    .addTag('users')
+    .addTag('endpoint')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
