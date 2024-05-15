@@ -36,8 +36,8 @@ export class UserController {
       throw new BadRequestException('User data is required.');
     }
 
-    const existingUser = await this.userService.getUserByUsername(
-      body.username,
+    const existingUser = await this.userService.getUserByEmail(
+      body.email,
     );
     if (existingUser) {
       throw new BadRequestException('Username already exists.');
@@ -46,7 +46,7 @@ export class UserController {
     const user = new User();
     user.firstname = body.firstname;
     user.lastname = body.lastname;
-    user.username = body.username;
+    user.email = body.email;
     user.password = await bcrypt.hash(user.password, 10);
     user.createdAt = new Date().toISOString();
     user.updatedAt = new Date().toISOString();

@@ -20,8 +20,8 @@ export class AuthController {
       throw new BadRequestException('Username and password are required');
     }
 
-    const { username, password } = body;
-    const token = await this.authService.loginUser(username, password);
+    const { email, password } = body;
+    const token = await this.authService.loginUser(email, password);
 
     if (!token) {
       throw new UnauthorizedException('Invalid username or password');
@@ -36,6 +36,7 @@ export class AuthController {
       throw new BadRequestException('Username and password are required');
     }
 
-    return await this.authService.registerUser(body);
+    const createdUser =  await this.authService.registerUser(body);
+    return new UserDto(createdUser);
   }
 }

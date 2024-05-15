@@ -22,7 +22,7 @@ export class User {
   updatedAt: string;
 
   @Prop({ unique: true, index: true })
-  username: string;
+  email: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

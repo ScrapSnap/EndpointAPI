@@ -16,7 +16,7 @@ export class UserService {
     return this.userModel.findById(id).exec();
   }
 
-  async getUserByUsername(username: string): Promise<User | null> {
-    return this.userModel.findOne({ username }).exec();
+  async getUserByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
   }
 }

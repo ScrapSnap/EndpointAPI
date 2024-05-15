@@ -18,7 +18,7 @@ export class UserDto {
   updatedAt: string;
 
   @ApiResponseProperty()
-  username: string;
+  email: string;
 
   constructor(args?: Partial<User | UserDto>) {
     this._id = args._id;
@@ -26,6 +26,6 @@ export class UserDto {
     this.firstname = args.firstname;
     this.lastname = args.lastname;
     this.updatedAt = args.updatedAt;
-    this.username = args.username;
+    this.email = args.email;
   }
 }

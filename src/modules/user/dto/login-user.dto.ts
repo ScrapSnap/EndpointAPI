@@ -2,13 +2,13 @@ import { ApiResponseProperty } from '@nestjs/swagger';
 
 export class LoginUserDto {
   @ApiResponseProperty()
-  username: string;
+  email: string;
 
   @ApiResponseProperty()
   password: string;
 
   constructor(args?: Partial<LoginUserDto>) {
-    this.username = args.username;
+    this.email = args.email;
     this.password = args.password;
   }
 }
