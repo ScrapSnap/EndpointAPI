@@ -18,8 +18,8 @@ import {
 } from '@nestjs/swagger';
 import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
-import * as brcypt from 'bcrypt';
 import { AuthGuard } from '../auth/auth.guard';
+import * as bcrypt from 'bcryptjs';
 
 @Controller('users')
 export class UserController {
@@ -47,7 +47,7 @@ export class UserController {
     user.firstname = body.firstname;
     user.lastname = body.lastname;
     user.username = body.username;
-    user.password = await brcypt.hash(body.password, 10);
+    user.password = await bcrypt.hash(user.password, 10);
     user.createdAt = new Date().toISOString();
     user.updatedAt = new Date().toISOString();
 
