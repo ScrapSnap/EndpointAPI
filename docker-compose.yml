@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      MONGODB_URI: mongodb://mongodb:27017/users-db
+      MONGODB_URI: mongodb://mongodb:27017/endpoint-api-db
 
   mongodb:
     image: mongo:latest
