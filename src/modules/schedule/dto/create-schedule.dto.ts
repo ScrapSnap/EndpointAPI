@@ -4,10 +4,10 @@ import { Schedule } from '../schemas/schedule.schema';
 import { GarbageType } from '../../utils/schemas/garbage-type.enum';
 import { Frequency } from '../../utils/schemas/frequency.enum';
 
-export class CreateScheduleDto extends PickType(Schedule, ['garbagetype', 'location', 'footnote', 'frequency', 'date'] as const) {
+export class CreateScheduleDto extends PickType(Schedule, ['garbageType', 'location', 'footnote', 'frequency', 'date'] as const) {
   @ApiProperty()
   @IsEnum(GarbageType)
-  garbagetype: GarbageType;
+  garbageType: GarbageType;
 
   @ApiProperty()
   @IsString()

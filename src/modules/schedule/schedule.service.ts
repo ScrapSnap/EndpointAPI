@@ -33,8 +33,8 @@ export class ScheduleService {
     return this.scheduleModel.deleteMany().exec();
   }
 
-  async findScheduleByGarbageType(garbagetype: string): Promise<Schedule[]> {
-    return this.scheduleModel.find({ garbagetype }).exec();
+  async findScheduleByGarbageType(garbageType: string): Promise<Schedule[]> {
+    return this.scheduleModel.find({ garbageType: garbageType }).exec();
   }
 
   async findScheduleByLocation(location: string): Promise<Schedule[]> {

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -22,7 +21,6 @@ import { Schedule } from './schemas/schedule.schema';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { AuthGuard } from '../auth/auth.guard';
-import { ExecutionContextHost } from '@nestjs/core/helpers/execution-context-host';
 
 @Controller('schedules')
 export class ScheduleController {
@@ -92,7 +90,7 @@ export class ScheduleController {
     return this.scheduleService.deleteAll();
   }
 
-  @Get('garbagetype/:garbageType')
+  @Get('garbage-type/:garbageType')
   @ApiOperation({ summary: 'Get schedule by garbage type' })
   @ApiOkResponse({ type: [ScheduleDto] })
   async findScheduleByGarbageType(@Param('garbageType') garbageType: string): Promise<ScheduleDto[]> {

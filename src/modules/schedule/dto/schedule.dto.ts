@@ -9,7 +9,7 @@ export class ScheduleDto {
   _id: string;
 
   @IsEnum(GarbageType)
-  garbagetype: GarbageType;
+  garbageType: GarbageType;
 
   @ApiResponseProperty()
   location: string;
@@ -28,7 +28,7 @@ export class ScheduleDto {
 
   constructor(args?: Partial<Schedule | ScheduleDto>) {
     this._id = args._id;
-    this.garbagetype = args.garbagetype;
+    this.garbageType = args.garbageType;
     this.location = args.location;
     this.footnote = args.footnote;
     this.frequency = args.frequency;

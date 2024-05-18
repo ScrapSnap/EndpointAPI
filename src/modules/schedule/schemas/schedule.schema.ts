@@ -9,10 +9,10 @@ export type ScheduleDoc = Schedule & Document;
 export class Schedule {
 
   _id: string;
-  
+
   @Prop({ required: true, enum: GarbageType })
   @IsEnum(GarbageType)
-  garbagetype: GarbageType;
+  garbageType: GarbageType;
 
   @Prop({ required: true, type: String})
   location: string;
