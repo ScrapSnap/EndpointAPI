@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  nestjs-api:
+  endpoint-api:
     build: .
     ports:
       - "3000:3000"
@@ -14,6 +14,15 @@ services:
       - mongo-data:/data/db
     ports:
       - "27017:27017"
+
+  web-app:
+    build:
+      context: ../ScrapSnapWEB
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    ports:
+      - "80:80"
 
 volumes:
   mongo-data:
