@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 
 @Schema()
-class Keys {
+export class Keys {
   @Prop({ required: true })
   p256dh: string;
 
@@ -10,10 +9,15 @@ class Keys {
   auth: string;
 }
 
-export const KeysSchema = SchemaFactory.createForClass(Keys);
+const KeysSchema = SchemaFactory.createForClass(Keys);
 
-@Schema()
-export class Subscription extends Document {
+@Schema({ collection: 'subscriptions' })
+export class Subscription {
+  _id: string;
+
+  @Prop({ required: true })
+  userId: string;
+
   @Prop({ required: true })
   endpoint: string;
 

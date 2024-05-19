@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Subscription } from './schemas/subscription.schema';
@@ -29,13 +29,18 @@ export class SubscriptionsService {
     return this.subscriptionModel.find().exec();
   }
 
-  async sendNotification(message: string) {
+  async sendNotificationToAll(title: string, body: string) {
     const subscriptions = await this.subscriptionModel.find().exec();
+
+    if (!subscriptions || !subscriptions.length) {
+      throw new InternalServerErrorException('No subscriptions found');
+    }
+
     const notificationPayload = {
       notification: {
-        title: 'New Notification',
-        body: message,
-        icon: 'assets/icons/icon-512x512.png',
+        title: title,
+        body: body,
+        icon: 'icons/icon-64x64.png',
       },
     };
 
@@ -44,5 +49,29 @@ export class SubscriptionsService {
     });
 
     await Promise.all(sendPromises);
+    return true;
+  }
+
+  async sendNotificationToUser(userId: string, title: string, body: string) {
+    const subscriptions = await this.subscriptionModel.find({ userId }).exec();
+
+    if (!subscriptions || !subscriptions.length) {
+      throw new InternalServerErrorException('User has no subscriptions');
+    }
+
+    const notificationPayload = {
+      notification: {
+        title: title,
+        body: body,
+        icon: 'icons/icon-64x64.png',
+      },
+    };
+
+    const sendPromises = subscriptions.map(subscription => {
+      return webpush.sendNotification(subscription, JSON.stringify(notificationPayload));
+    });
+
+    await Promise.all(sendPromises);
+    return true;
   }
 }

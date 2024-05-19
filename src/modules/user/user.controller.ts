@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
+  Get, InternalServerErrorException,
   Param,
   Post,
   UseGuards,
@@ -52,7 +52,6 @@ export class UserController {
     user.updatedAt = new Date().toISOString();
 
     const createdUser = await this.userService.createUser(user);
-    console.log('createdUser', new UserDto(createdUser));
     return new UserDto(createdUser);
   }
 
@@ -63,6 +62,11 @@ export class UserController {
   @ApiNotFoundResponse()
   async getUserById(@Param('id') id: string): Promise<UserDto> {
     const user = await this.userService.getUserById(id);
+
+    if (!user) {
+      throw new InternalServerErrorException('User not found.');
+    }
+
     return new UserDto(user);
   }
 }
