@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -22,6 +23,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import * as bcrypt from 'bcryptjs';
 
 @Controller('users')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
