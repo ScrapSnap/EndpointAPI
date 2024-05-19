@@ -6,10 +6,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ScheduleModule } from './modules/schedule/schedule.module';
 import { EnumModule } from './modules/utils/enum.module';
 import { ImageSnapsModule } from './modules/image-snaps/image-snaps.module';
+import { CollectionPointsModule } from './modules/collection-points/collection-points.module';
 
 
 @Module({
-  imports: [UserModule, AuthModule, ScheduleModule, EnumModule, ImageSnapsModule],
+  imports: [UserModule, AuthModule, ScheduleModule, EnumModule, ImageSnapsModule, CollectionPointsModule],
   controllers: [AppController],
   providers: [AppService],
 })
