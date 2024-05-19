@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Schedule} from './schemas/schedule.schema';
+import { Schedule } from './schemas/schedule.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
