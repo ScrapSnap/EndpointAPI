@@ -29,7 +29,7 @@ import {
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  //@UseGuards(AuthGuard)
+  @UseGuards(AuthGuard)
   @Post()
   @ApiOperation({ summary: 'Create stat for user' })
   @ApiOkResponse({ type: CreateStatDto })
@@ -39,6 +39,7 @@ export class StatsController {
     return this.statsService.create(createStatDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all stats' })
   @ApiOkResponse({ type: [Stat] })
@@ -48,6 +49,7 @@ export class StatsController {
     return this.statsService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get stat by id' })
   @ApiOkResponse({ type: Stat })
@@ -57,6 +59,7 @@ export class StatsController {
     return this.statsService.findOne(id);
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
   @ApiOperation({ summary: 'Update stat by id' })
   @ApiOkResponse({ type: Stat })
@@ -66,6 +69,7 @@ export class StatsController {
     return this.statsService.update(id, updateStatDto);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete stat by id' })
   @ApiOkResponse({ type: Stat })
@@ -75,6 +79,7 @@ export class StatsController {
     return this.statsService.delete(id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete()
   @ApiOperation({ summary: 'Delete all stats' })
   @ApiOkResponse({ type: Stat })
@@ -84,6 +89,7 @@ export class StatsController {
     return this.statsService.deleteAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get stats by user id' })
   @ApiOkResponse({ type: [Stat] })
@@ -93,6 +99,7 @@ export class StatsController {
     return this.statsService.findStatByUserId(userId);
   }
 
+  @UseGuards(AuthGuard)
   @Get('date/:date')
   @ApiOperation({ summary: 'Get stats by date' })
   @ApiOkResponse({ type: [Stat] })
@@ -102,6 +109,7 @@ export class StatsController {
     return this.statsService.findStatByDate(date);
   }
 
+  @UseGuards(AuthGuard)
   @Get('with-garbage-type/:type')
   @ApiOperation({ summary: 'Get stats with garbage type' })
   @ApiOkResponse({ type: [Stat] })
