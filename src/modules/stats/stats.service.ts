@@ -35,7 +35,91 @@ export class StatsService {
   }
 
   async findStatByUserId(userId: string): Promise<Stat[]> {
-    return this.statModel.find({ userId }).exec();
+    return this.statModel.aggregate([
+      {
+        $match: { userId },
+      },
+      {
+        $group: {
+          _id: '$userId',
+          totalPaper: { $sum: '$garbageCollected.paper' },
+          totalPlastic: { $sum: '$garbageCollected.plastic' },
+          totalGlass: { $sum: '$garbageCollected.glass' },
+          totalMetal: { $sum: '$garbageCollected.metal' },
+          totalOrganic: { $sum: '$garbageCollected.organic' },
+
+          total: {
+            $sum: {
+              $add: [
+                '$garbageCollected.paper',
+                '$garbageCollected.plastic',
+                '$garbageCollected.glass',
+                '$garbageCollected.metal',
+                '$garbageCollected.organic',
+              ],
+            },
+          },
+
+          count: { $sum: 1 },
+
+          avgPaper: { $avg: '$garbageCollected.paper' },
+          avgPlastic: { $avg: '$garbageCollected.plastic' },
+          avgGlass: { $avg: '$garbageCollected.glass' },
+          avgMetal: { $avg: '$garbageCollected.metal' },
+          avgOrganic: { $avg: '$garbageCollected.organic' },
+
+          avg: {
+            $avg: {
+              $add: [
+                '$garbageCollected.paper',
+                '$garbageCollected.plastic',
+                '$garbageCollected.glass',
+                '$garbageCollected.metal',
+                '$garbageCollected.organic',
+              ],
+            },
+          },
+          
+          minPaper: { $min: '$garbageCollected.paper' },
+          minPlastic: { $min: '$garbageCollected.plastic' },
+          minGlass: { $min: '$garbageCollected.glass' },
+          minMetal: { $min: '$garbageCollected.metal' },
+          minOrganic: { $min: '$garbageCollected.organic' },
+
+          min: {
+            $min: {
+              $add: [
+                '$garbageCollected.paper',
+                '$garbageCollected.plastic',
+                '$garbageCollected.glass',
+                '$garbageCollected.metal',
+                '$garbageCollected.organic',
+              ],
+            },
+          },
+
+          maxPaper: { $max: '$garbageCollected.paper' },
+          maxPlastic: { $max: '$garbageCollected.plastic' },
+          maxGlass: { $max: '$garbageCollected.glass' },
+          maxMetal: { $max: '$garbageCollected.metal' },
+          maxOrganic: { $max: '$garbageCollected.organic' },
+
+          max: {
+            $max: {
+              $add: [
+                '$garbageCollected.paper',
+                '$garbageCollected.plastic',
+                '$garbageCollected.glass',
+                '$garbageCollected.metal',
+                '$garbageCollected.organic',
+              ],
+            },
+          },
+
+          garbageCollected: { $push: '$garbageCollected' },
+        },
+      },
+    ]);
   }
 
   async findStatByDate(date: Date): Promise<Stat[]> {
