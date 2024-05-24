@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { UserService } from "./modules/user/user.service";
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -19,6 +20,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
+  const userService = app.get(UserService);
+  await userService.initDefaultUserWithRole();
+
   await app.listen(3000);
 }
-bootstrap();
+bootstrap().then(r => console.log('Server is running on port 3000'));

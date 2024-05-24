@@ -6,6 +6,7 @@ import { Schedule, ScheduleSchema } from './schemas/schedule.schema';
 import * as dotenv from 'dotenv';
 import { AuthGuard } from '../auth/auth.guard';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PermissionsGuard } from "../permissions/permission.guard";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ dotenv.config();
     MongooseModule.forFeature([{ name: Schedule.name, schema: ScheduleSchema }]),
   ],
   controllers: [ScheduleController],
-  providers: [ScheduleService, AuthGuard, JwtService],
+  providers: [ScheduleService, AuthGuard, JwtService, PermissionsGuard],
 })
 
 export class ScheduleModule {}

@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
 import { UserDto } from "../user/dto/user.dto";
+import {Role} from "../permissions/schemas/role.schema";
 
 dotenv.config();
 
@@ -14,24 +15,36 @@ dotenv.config();
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Role.name) private roleModel: Model<Role>,
     private readonly jwtService: JwtService,
   ) {}
 
-  async generateToken(userId: string): Promise<string> {
-    const payload = { sub: userId };
+  async generateToken(userId: string, permissions: number[]): Promise<string> {
+    const payload = {
+      userId: userId,
+      permissions: permissions
+    };
     return this.jwtService.sign(payload, { secret: process.env.JWT_SECRET });
   }
 
-  async loginUser(email: string, password: string): Promise<{ token: string, user: UserDto } | null>  {
+  async loginUser(email: string, password: string): Promise<{ token: string, user: UserDto } | null> {
     const user = await this.userModel.findOne({ email }).exec();
+    const validPassword = await bcrypt.compare(password, user.password);
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = await this.generateToken(user._id);
-      const userDto = new UserDto(user);
-      return { token, user: userDto };
-    } else {
+    if (!user || !validPassword) {
       throw new UnauthorizedException('Invalid username or password');
     }
+
+    const role = await this.roleModel.findById(user.roleId).exec();
+    let permissions: number[] = [];
+
+    if (role) {
+      permissions = role.permissions ?? [];
+    }
+
+    const token = await this.generateToken(user._id, permissions);
+    const userDto = new UserDto(user);
+    return { token, user: userDto };
   }
 
   async registerUser(user: CreateUserDto): Promise<User> {

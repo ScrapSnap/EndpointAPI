@@ -9,9 +9,11 @@ import { ImageSnapsModule } from './modules/image-snaps/image-snaps.module';
 import { CollectionPointsModule } from './modules/collection-points/collection-points.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { RoleModule } from "./modules/permissions/role.module";
 
 @Module({
-  imports: [UserModule, AuthModule, ScheduleModule, EnumModule, CollectionPointsModule, StatsModule, SubscriptionsModule, ImageSnapsModule],
+  imports: [UserModule, AuthModule, ScheduleModule, EnumModule, CollectionPointsModule, StatsModule,
+            SubscriptionsModule, ImageSnapsModule, RoleModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -21,15 +21,19 @@ import { User } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import * as bcrypt from 'bcryptjs';
-import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
+import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
+import { Permission } from "../permissions/enums/permissions.enum";
+import { Permissions } from '../permissions/enums/permissions.decorator';
+import { PermissionsGuard } from "../permissions/permission.guard";
 
 @Controller('users')
+@UseGuards(AuthGuard, PermissionsGuard)
 @ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @UseGuards(AuthGuard)
   @Post()
+  @Permissions(Permission.WRITE_USERS)
   @ApiOperation({ summary: 'Create user' })
   @ApiOkResponse({ type: UserDto })
   @ApiUnauthorizedResponse()
@@ -58,7 +62,6 @@ export class UserController {
     return new UserDto(createdUser);
   }
 
-  @UseGuards(AuthGuard)
   @Put('/:id')
   @ApiOperation({ summary: 'Update user' })
   @ApiOkResponse({ type: UserDto })
@@ -83,7 +86,6 @@ export class UserController {
     return new UserDto(updatedUser);
   }
 
-  @UseGuards(AuthGuard)
   @Put('/:id/password')
   @ApiOperation({ summary: 'Change password' })
   @ApiOkResponse({ type: UserDto })
@@ -108,7 +110,6 @@ export class UserController {
     return this.userService.updateUser(id, user);
   }
 
-  @UseGuards(AuthGuard)
   @Get('/:id')
   @ApiOperation({ summary: 'Get user by id' })
   @ApiOkResponse({ type: UserDto })
@@ -121,5 +122,15 @@ export class UserController {
     }
 
     return new UserDto(user);
+  }
+
+  @Get()
+  @Permissions(Permission.READ_USERS)
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiOkResponse({ type: [UserDto] })
+  @ApiNotFoundResponse()
+  async getUsers(): Promise<UserDto[]> {
+    const users = await this.userService.getUsers();
+    return users.map((user) => new UserDto(user));
   }
 }
