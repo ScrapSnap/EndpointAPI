@@ -7,6 +7,7 @@ export class CreateUserDto extends PickType(User, [
   'lastname',
   'password',
   'email',
+  'roleId',
 ]) {
   @ApiProperty()
   id: string;
@@ -22,6 +23,9 @@ export class CreateUserDto extends PickType(User, [
 
   @ApiProperty()
   email: string;
+
+  @ApiProperty()
+  roleId: string;
 
   constructor(args?: Partial<CreateUserDto>) {
     super();

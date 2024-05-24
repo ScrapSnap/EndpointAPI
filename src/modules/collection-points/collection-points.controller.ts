@@ -5,14 +5,17 @@ import { UpdateCollectionPointDto } from './dto/update-collection-point.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CollectionPoint } from './schemas/collection-point.schema';
 import { AuthGuard } from '../auth/auth.guard';
+import { Permission } from "../permissions/enums/permissions.enum";
+import { Permissions } from '../permissions/enums/permissions.decorator';
 
 @ApiTags('Collection-points')
+@UseGuards(AuthGuard)
 @Controller('collection-points')
 export class CollectionPointsController {
   constructor(private readonly collectionPointsService: CollectionPointsService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
+  @Permissions(Permission.WRITE_COLLECTION_POINTS)
   @ApiOperation({ summary: 'Create a new collection point' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'The collection point has been successfully created.', type: CollectionPoint })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
@@ -25,7 +28,6 @@ export class CollectionPointsController {
   @Get()
   @ApiOperation({ summary: 'Get all collection points' })
   @ApiResponse({ status: HttpStatus.OK, description: 'List of all collection points.', type: [CollectionPoint] })
-  
   findAll() {
     return this.collectionPointsService.findAll();
   }
@@ -34,13 +36,12 @@ export class CollectionPointsController {
   @ApiOperation({ summary: 'Get a collection point by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'The collection point with the specified ID.', type: CollectionPoint })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Collection point not found.' })
-  
   findOne(@Param('id') id: string) {
     return this.collectionPointsService.findOne(id);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
+  @Permissions(Permission.WRITE_COLLECTION_POINTS)
   @ApiOperation({ summary: 'Replace a collection point by ID (Idempotent)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'The collection point has been successfully replaced.', type: CollectionPoint })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Collection point not found.' })
@@ -51,7 +52,7 @@ export class CollectionPointsController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
+  @Permissions(Permission.WRITE_COLLECTION_POINTS)
   @ApiOperation({ summary: 'Update a collection point by ID (Not idempotent use carefuly)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'The collection point has been successfully updated.', type: CollectionPoint })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Collection point not found.' })
@@ -62,7 +63,7 @@ export class CollectionPointsController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @Permissions(Permission.DELETE_COLLECTION_POINTS)
   @ApiOperation({ summary: 'Delete a collection point by ID' })
   @ApiResponse({ status: HttpStatus.NO_CONTENT, description: 'The collection point has been successfully deleted.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Collection point not found.' })
