@@ -14,6 +14,7 @@ async function bootstrap() {
     .setDescription('API for user management')
     .setVersion('0.0.1')
     .addTag('endpoint')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
