@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
+  Get, InternalServerErrorException,
   Param,
   Post, Put,
   UseGuards,
@@ -113,6 +113,11 @@ export class UserController {
   @ApiNotFoundResponse()
   async getUserById(@Param('id') id: string): Promise<UserDto> {
     const user = await this.userService.getUserById(id);
+
+    if (!user) {
+      throw new InternalServerErrorException('User not found.');
+    }
+
     return new UserDto(user);
   }
 }
