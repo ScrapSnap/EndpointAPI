@@ -5,8 +5,8 @@ import { UpdateCollectionPointDto } from './dto/update-collection-point.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CollectionPoint } from './schemas/collection-point.schema';
 import { AuthGuard } from '../auth/auth.guard';
-import { Permission } from "../permissions/enums/permissions.enum";
-import { Permissions } from '../permissions/enums/permissions.decorator';
+import { Permission } from "../roles/enums/permissions.enum";
+import { Permissions } from '../roles/enums/permissions.decorator';
 
 @ApiTags('Collection-points')
 @UseGuards(AuthGuard)

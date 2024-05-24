@@ -7,7 +7,8 @@ import * as dotenv from 'dotenv';
 import { AuthGuard } from '../auth/auth.guard';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PermissionsGuard } from "../permissions/permission.guard";
-import { Role, RoleSchema } from "../permissions/schemas/role.schema";
+import { Role, RoleSchema } from "../roles/schemas/role.schema";
+import { RoleService } from "../roles/role.service";
 
 dotenv.config();
 
@@ -22,6 +23,6 @@ dotenv.config();
     MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
   ],
   controllers: [UserController],
-  providers: [UserService, AuthGuard, JwtService, PermissionsGuard],
+  providers: [UserService, AuthGuard, JwtService, PermissionsGuard, RoleService],
 })
 export class UserModule {}

@@ -15,7 +15,7 @@ export class SubscriptionsController {
   @Post()
   async create(@Req() request: Request, @Body() subscriptionDto: CreateSubscriptionDto): Promise<Subscription> {
     const subscription = new Subscription();
-    subscription.userId = request['user'].sub;
+    subscription.userId = request['user'].userId;
     subscription.endpoint = subscriptionDto.endpoint;
     subscription.keys = new Keys();
     subscription.keys.p256dh = subscriptionDto.keys.p256dh;

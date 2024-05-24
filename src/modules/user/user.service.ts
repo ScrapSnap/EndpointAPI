@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { getAllPermissions } from "../permissions/enums/permissions.enum";
-import { Role } from "../permissions/schemas/role.schema";
+import { getAllPermissions } from "../roles/enums/permissions.enum";
+import { Role } from "../roles/schemas/role.schema";
 import * as bcrypt from "bcryptjs";
 
 @Injectable()

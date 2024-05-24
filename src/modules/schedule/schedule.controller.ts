@@ -23,8 +23,8 @@ import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { PermissionsGuard } from "../permissions/permission.guard";
-import { Permission } from "../permissions/enums/permissions.enum";
-import { Permissions } from '../permissions/enums/permissions.decorator';
+import { Permission } from "../roles/enums/permissions.enum";
+import { Permissions } from '../roles/enums/permissions.decorator';
 
 @ApiTags('schedules')
 @UseGuards(AuthGuard, PermissionsGuard)

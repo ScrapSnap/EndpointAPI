@@ -9,11 +9,12 @@ import { ImageSnapsModule } from './modules/image-snaps/image-snaps.module';
 import { CollectionPointsModule } from './modules/collection-points/collection-points.module';
 import { StatsModule } from './modules/stats/stats.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
-import { RoleModule } from "./modules/permissions/role.module";
+import { RoleModule } from "./modules/roles/role.module";
+import { PermissionModule } from "./modules/permissions/permission.module";
 
 @Module({
   imports: [UserModule, AuthModule, ScheduleModule, EnumModule, CollectionPointsModule, StatsModule,
-            SubscriptionsModule, ImageSnapsModule, RoleModule],
+            SubscriptionsModule, ImageSnapsModule, RoleModule, PermissionModule],
   controllers: [AppController],
   providers: [AppService],
 })

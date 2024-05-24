@@ -3,7 +3,7 @@ import {CreateStatDto} from './dto/create-stat.dto';
 import {UpdateStatDto} from './dto/update-stat.dto';
 import {Stat} from './schemas/stat.schema';
 import {AuthGuard} from '../auth/auth.guard';
-import {Permissions} from '../permissions/enums/permissions.decorator';
+import {Permissions} from '../roles/enums/permissions.decorator';
 
 import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards,} from '@nestjs/common';
 
@@ -15,7 +15,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import {Permission} from "../permissions/enums/permissions.enum";
+import {Permission} from "../roles/enums/permissions.enum";
 
 @ApiTags('stats')
 @UseGuards(AuthGuard)

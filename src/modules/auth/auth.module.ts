@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user.schema';
-import { Role, RoleSchema } from "../permissions/schemas/role.schema";
+import { Role, RoleSchema } from "../roles/schemas/role.schema";
 import * as dotenv from 'dotenv';
 
 dotenv.config();

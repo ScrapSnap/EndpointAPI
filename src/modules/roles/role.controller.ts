@@ -20,7 +20,7 @@ export class RoleController {
     constructor(private readonly roleService: RoleService) {}
 
     @Post()
-    @ApiOperation({ summary: 'Create new role' })
+    @ApiOperation({ summary: 'Create new roles' })
     @ApiOkResponse({ type: UserDto })
     @ApiUnauthorizedResponse()
     @ApiBadRequestResponse()

@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PERMISSIONS_KEY } from './enums/permissions.decorator';
-import { Permission } from './enums/permissions.enum';
+import { PERMISSIONS_KEY } from '../roles/enums/permissions.decorator';
+import { Permission } from '../roles/enums/permissions.enum';
 import { Request } from "express";
 import { JwtService } from "@nestjs/jwt";
 
@@ -19,7 +19,7 @@ export class PermissionsGuard implements CanActivate {
         ]);
 
         if (!requiredPermissions) {
-            return true; // No permissions required, so allow access
+            return true; // No roles required, so allow access
         }
 
         const request = context.switchToHttp().getRequest();

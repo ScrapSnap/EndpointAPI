@@ -2,7 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get, InternalServerErrorException,
+  Get, InternalServerErrorException, NotFoundException,
   Param,
   Post, Put,
   UseGuards,
@@ -22,8 +22,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import * as bcrypt from 'bcryptjs';
 import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
-import { Permission } from "../permissions/enums/permissions.enum";
-import { Permissions } from '../permissions/enums/permissions.decorator';
+import { Permission } from "../roles/enums/permissions.enum";
+import { Permissions } from '../roles/enums/permissions.decorator';
 import { PermissionsGuard } from "../permissions/permission.guard";
 
 @Controller('users')

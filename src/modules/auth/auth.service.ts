@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import * as dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
 import { UserDto } from "../user/dto/user.dto";
-import {Role} from "../permissions/schemas/role.schema";
+import { Role } from "../roles/schemas/role.schema";
 
 dotenv.config();
 
