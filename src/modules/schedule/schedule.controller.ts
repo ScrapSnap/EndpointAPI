@@ -22,15 +22,18 @@ import { Schedule } from './schemas/schedule.schema';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { UpdateScheduleDto } from './dto/update-schedule.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { PermissionsGuard } from "../permissions/permission.guard";
+import { Permission } from "../roles/enums/permissions.enum";
+import { Permissions } from '../roles/enums/permissions.decorator';
 
 @ApiTags('schedules')
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
-
-  @UseGuards(AuthGuard)
   @Post()
+  @Permissions(Permission.WRITE_SCHEDULES)
   @ApiOperation({ summary: 'Create schedule' })
   @ApiOkResponse({ type: ScheduleDto })
   @ApiUnauthorizedResponse()
@@ -56,8 +59,8 @@ export class ScheduleController {
     return new ScheduleDto(schedule);
   }
 
-  @UseGuards(AuthGuard)
   @Put(':id')
+  @Permissions(Permission.WRITE_SCHEDULES)
   @ApiOperation({ summary: 'Update schedule by id' })
   @ApiOkResponse({ type: ScheduleDto })
   @ApiNotFoundResponse()
@@ -74,8 +77,8 @@ export class ScheduleController {
     return new ScheduleDto(updatedSchedule);
   }
 
-  @UseGuards(AuthGuard)
   @Delete(':id')
+  @Permissions(Permission.DELETE_SCHEDULES)
   @ApiOperation({ summary: 'Delete schedule by id' })
   @ApiOkResponse({ type: ScheduleDto })
   @ApiNotFoundResponse()
@@ -84,7 +87,6 @@ export class ScheduleController {
     return new ScheduleDto(schedule);
   }
 
-  @UseGuards(AuthGuard)
   @Delete()
   @ApiOperation({ summary: 'Delete all schedules' })
   @ApiOkResponse()

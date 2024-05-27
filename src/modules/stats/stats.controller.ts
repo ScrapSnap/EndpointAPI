@@ -1,36 +1,30 @@
-import { StatsService } from './stats.service';
-import { CreateStatDto } from './dto/create-stat.dto';
-import { UpdateStatDto } from './dto/update-stat.dto';
-import { Stat } from './schemas/stat.schema';
-import { AuthGuard } from '../auth/auth.guard';
+import {StatsService} from './stats.service';
+import {CreateStatDto} from './dto/create-stat.dto';
+import {UpdateStatDto} from './dto/update-stat.dto';
+import {Stat} from './schemas/stat.schema';
+import {AuthGuard} from '../auth/auth.guard';
+import {Permissions} from '../roles/enums/permissions.decorator';
 
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  Delete,
-  UseGuards,
-} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards,} from '@nestjs/common';
 
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiUnauthorizedResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import {Permission} from "../roles/enums/permissions.enum";
 
 @ApiTags('stats')
+@UseGuards(AuthGuard)
 @Controller('stats')
 export class StatsController {
   constructor(private readonly statsService: StatsService) {}
 
-  @UseGuards(AuthGuard)
   @Post()
+  @Permissions(Permission.WRITE_USER_STATISTICS)
   @ApiOperation({ summary: 'Create stat for user' })
   @ApiOkResponse({ type: CreateStatDto })
   @ApiUnauthorizedResponse()
@@ -39,7 +33,6 @@ export class StatsController {
     return this.statsService.create(createStatDto);
   }
 
-  @UseGuards(AuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all stats' })
   @ApiOkResponse({ type: [Stat] })
@@ -49,7 +42,6 @@ export class StatsController {
     return this.statsService.findAll();
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   @ApiOperation({ summary: 'Get stat by id' })
   @ApiOkResponse({ type: Stat })
@@ -59,7 +51,6 @@ export class StatsController {
     return this.statsService.findOne(id);
   }
 
-  @UseGuards(AuthGuard)
   @Put(':id')
   @ApiOperation({ summary: 'Update stat by id' })
   @ApiOkResponse({ type: Stat })
@@ -69,8 +60,8 @@ export class StatsController {
     return this.statsService.update(id, updateStatDto);
   }
 
-  @UseGuards(AuthGuard)
   @Delete(':id')
+  @Permissions(Permission.DELETE_USER_STATISTICS)
   @ApiOperation({ summary: 'Delete stat by id' })
   @ApiOkResponse({ type: Stat })
   @ApiUnauthorizedResponse()
@@ -79,8 +70,8 @@ export class StatsController {
     return this.statsService.delete(id);
   }
 
-  @UseGuards(AuthGuard)
   @Delete()
+  @Permissions(Permission.DELETE_USER_STATISTICS)
   @ApiOperation({ summary: 'Delete all stats' })
   @ApiOkResponse({ type: Stat })
   @ApiUnauthorizedResponse()
@@ -89,7 +80,6 @@ export class StatsController {
     return this.statsService.deleteAll();
   }
 
-  @UseGuards(AuthGuard)
   @Get('user/:userId')
   @ApiOperation({ summary: 'Get stats by user id' })
   @ApiOkResponse({ type: [Stat] })
@@ -99,7 +89,6 @@ export class StatsController {
     return this.statsService.findStatByUserId(userId);
   }
 
-  @UseGuards(AuthGuard)
   @Get('date/:date')
   @ApiOperation({ summary: 'Get stats by date' })
   @ApiOkResponse({ type: [Stat] })
@@ -109,7 +98,6 @@ export class StatsController {
     return this.statsService.findStatByDate(date);
   }
 
-  @UseGuards(AuthGuard)
   @Get('with-garbage-type/:type')
   @ApiOperation({ summary: 'Get stats with garbage type' })
   @ApiOkResponse({ type: [Stat] })

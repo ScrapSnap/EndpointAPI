@@ -6,6 +6,7 @@ import { Stat, StatSchema } from './schemas/stat.schema';
 import * as dotenv from 'dotenv';
 import { AuthGuard } from '../auth/auth.guard';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { PermissionsGuard } from "../permissions/permission.guard";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ dotenv.config();
     MongooseModule.forFeature([{ name: Stat.name, schema: StatSchema }]),
   ],
   controllers: [StatsController],
-  providers: [StatsService, AuthGuard, JwtService],
+  providers: [StatsService, AuthGuard, JwtService, PermissionsGuard],
 })
 
 export class StatsModule {}
