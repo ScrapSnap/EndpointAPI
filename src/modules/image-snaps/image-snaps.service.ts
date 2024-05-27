@@ -5,10 +5,21 @@ import * as Minio from 'minio';
 import { ImageSnap } from './schemas/image-snap.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
+axiosRetry(axios, {
+  retryDelay: (retryCount) => {
+    return retryCount * 1000; // Time in ms to wait before retrying
+  },
+  retryCondition: (error) => {
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) || error.response.status >= 500;
+  },
+});
 @Injectable()
 export class ImageSnapsService {
   private minioClient: Minio.Client;
+  private readonly geoApiKey: string;
   private readonly logger = new Logger(ImageSnapsService.name);
 
   constructor(private configService: ConfigService,
@@ -22,12 +33,28 @@ export class ImageSnapsService {
       secretKey: this.configService.get('MINIO_SECRET_KEY'),
     });
 
+    this.geoApiKey = this.configService.get('GEOCODE_API_KEY');
   }
 
   private async createBucketIfNotExists(bucketName: string) {
     const bucketExists = await this.minioClient.bucketExists(bucketName);
     if (!bucketExists) {
       await this.minioClient.makeBucket(bucketName);
+    }
+  }
+
+  async getAddressFromCoordinates(longitude: number, latitude: number)  {
+    this.logger.log(`API Key: ${this.geoApiKey}`);
+    const fetchUrl = `https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}&api_key=${this.geoApiKey}`;
+    this.logger.log(`Fetching: ${fetchUrl}`);
+    
+    try {
+      const response = await axios.get(fetchUrl);
+      this.logger.log(`Response: ${JSON.stringify(response.data)}`);
+      return response.data.display_name;
+    } catch (error) {
+      this.logger.error(`Error fetching data: ${error}`);
+      throw new HttpException('Failed to fetch address from coordinates', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -109,6 +136,22 @@ export class ImageSnapsService {
         fileName: imageSnap.fileName,
         bucketName: imageSnap.bucketName,
         
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get file names: ${error}`);
+      throw new HttpException(`Failed to get file names: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getFileInfoOfFilesInBucket(bucketName: string): Promise<{ fileName: string, userId: string, longitude: number, latitude: number, created: Date }[]> {
+    try {
+      const imageSnaps = await this.imageSnapModel.find({ bucketName: bucketName });
+      return imageSnaps.map(imageSnap => ({
+        fileName: imageSnap.fileName,
+        userId: imageSnap.userId,
+        longitude: imageSnap.longitude,
+        latitude: imageSnap.latitude,
+        created: imageSnap.createdAt
       }));
     } catch (error) {
       this.logger.error(`Failed to get file names: ${error}`);
