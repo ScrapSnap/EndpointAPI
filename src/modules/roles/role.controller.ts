@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Post, UseGuards } from "@nestjs/common";
+import {BadRequestException, Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
 import { AuthGuard } from "../auth/auth.guard";
 import {
     ApiBadRequestResponse,
@@ -7,7 +7,6 @@ import {
     ApiOperation,
     ApiUnauthorizedResponse
 } from "@nestjs/swagger";
-import { UserDto } from "../user/dto/user.dto";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { RoleDto } from "./dto/role.dto";
 import { RoleService } from "./role.service";
@@ -19,9 +18,24 @@ import { Role } from "./schemas/role.schema";
 export class RoleController {
     constructor(private readonly roleService: RoleService) {}
 
+    @Get()
+    @ApiOperation({ summary: 'Get all roles' })
+    @ApiOkResponse({ type: [RoleDto] })
+    @ApiUnauthorizedResponse()
+    async getRoles(): Promise<RoleDto[]> {
+        const roles = await this.roleService.getRoles();
+        return roles.map(role => {
+            const roleDto = new RoleDto();
+            roleDto.id = role._id;
+            roleDto.name = role.name;
+            roleDto.permissions = role.permissions;
+            return roleDto;
+        });
+    }
+
     @Post()
     @ApiOperation({ summary: 'Create new roles' })
-    @ApiOkResponse({ type: UserDto })
+    @ApiOkResponse({ type: RoleDto })
     @ApiUnauthorizedResponse()
     @ApiBadRequestResponse()
     async createRole(@Body() body: CreateRoleDto): Promise<RoleDto> {

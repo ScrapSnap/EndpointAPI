@@ -22,7 +22,7 @@ export class ScheduleService {
   }
 
   async update(id: string, schedule: Schedule): Promise<Schedule | null> {
-    return this.scheduleModel.findByIdAndUpdate(id, schedule, { new: true }).exec();
+    return this.scheduleModel.findByIdAndUpdate(id, schedule).exec();
   }
 
   async delete(id: string): Promise<Schedule | null> {
