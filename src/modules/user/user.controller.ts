@@ -27,6 +27,7 @@ import { Permissions } from '../roles/enums/permissions.decorator';
 import { PermissionsGuard } from "../permissions/permission.guard";
 import { RoleService } from "../roles/role.service";
 import { Request } from "express";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Controller('users')
 @UseGuards(AuthGuard, PermissionsGuard)
@@ -95,7 +96,7 @@ export class UserController {
   @ApiOkResponse({ type: UserDto })
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
-  async updateUser(@Param('id') id: string, @Body() body: CreateUserDto): Promise<UserDto> {
+  async updateUser(@Req() request: Request, @Param('id') id: string, @Body() body: UpdateUserDto): Promise<UserDto> {
     if (!body) {
       throw new BadRequestException('User data is required.');
     }
@@ -103,6 +104,24 @@ export class UserController {
     const user = await this.userService.getUserById(id);
     if (!user) {
       throw new BadRequestException('User not found.');
+    }
+
+    // Check permissions if current user is not updating their own profile
+    const userId = request['user'].userId;
+    if (userId !== id) {
+        const hasPermission = await this.roleService.hasPermission(userId, Permission.WRITE_USERS);
+        if (!hasPermission) {
+            throw new UnauthorizedException('You do not have permission to update this user.');
+        }
+    }
+
+    if (body.password && body.password !== '') {
+        const hashed = await bcrypt.hash(body.password, 10);
+        if (!hashed) {
+            throw new BadRequestException('Error hashing password');
+        }
+
+        user.password = hashed;
     }
 
     user.firstname = body.firstname;
