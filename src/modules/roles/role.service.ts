@@ -29,7 +29,7 @@ export class RoleService {
     }
 
     async getDefaultRole(): Promise<Role | null> {
-        const defaultRole = this.roleModel.findOne({ name: 'User' }).exec();
+        const defaultRole = this.roleModel.findOne({ isDefault: true }).exec();
         if (defaultRole) {
             return defaultRole;
         }
@@ -37,6 +37,7 @@ export class RoleService {
         const role = new Role();
         role.name = 'User';
         role.permissions = [];
+        role.isDefault = true;
         return this.createRole(role);
     }
 

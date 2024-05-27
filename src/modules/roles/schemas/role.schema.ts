@@ -11,6 +11,9 @@ export class Role {
 
     @Prop({ required: true, type: [Number] })
     permissions: number[];
+
+    @Prop({ required: true, type: Boolean })
+    isDefault: boolean;
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);
