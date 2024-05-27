@@ -7,6 +7,10 @@ import { Role } from "./schemas/role.schema";
 export class RoleService {
     constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
 
+    async getRoles(): Promise<Role[]> {
+        return this.roleModel.find().exec();
+    }
+
     async createRole(role: Role): Promise<Role> {
         const createRole = new this.roleModel(role);
         return createRole.save();
