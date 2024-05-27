@@ -1,4 +1,4 @@
-import {BadRequestException, Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from "@nestjs/common";
 import { AuthGuard } from "../auth/auth.guard";
 import {
     ApiBadRequestResponse,
@@ -11,6 +11,8 @@ import { CreateRoleDto } from "./dto/create-role.dto";
 import { RoleDto } from "./dto/role.dto";
 import { RoleService } from "./role.service";
 import { Role } from "./schemas/role.schema";
+import { Permissions } from "./enums/permissions.decorator";
+import { Permission } from "./enums/permissions.enum";
 
 @Controller('roles')
 @UseGuards(AuthGuard)
@@ -34,6 +36,7 @@ export class RoleController {
     }
 
     @Post()
+    @Permissions(Permission.WRITE_USERS)
     @ApiOperation({ summary: 'Create new roles' })
     @ApiOkResponse({ type: RoleDto })
     @ApiUnauthorizedResponse()
@@ -51,8 +54,42 @@ export class RoleController {
         const role = new Role();
         role.name = body.name;
         role.permissions = body.permissions;
+        role.isDefault = false;
 
         const createdRole = await this.roleService.createRole(role);
         return new RoleDto(createdRole);
+    }
+
+    @Put('/:id')
+    @Permissions(Permission.WRITE_USERS)
+    @ApiOperation({ summary: 'Update role' })
+    @ApiOkResponse({ type: RoleDto })
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
+    async updateRole(@Param('id') id: string, @Body() body: CreateRoleDto): Promise<RoleDto> {
+        if (!body) {
+            throw new BadRequestException('Role data is required.');
+        }
+
+        const role = await this.roleService.getRoleById(id);
+        if (!role) {
+            throw new BadRequestException('Role not found.');
+        }
+
+        role.name = body.name;
+        role.permissions = body.permissions;
+
+        const updatedRole = await this.roleService.updateRoleById(id, role);
+        return new RoleDto(updatedRole);
+    }
+
+    @Delete('/:id')
+    @Permissions(Permission.WRITE_USERS)
+    @ApiOperation({ summary: 'Delete role by id' })
+    @ApiOkResponse()
+    @ApiUnauthorizedResponse()
+    @ApiBadRequestResponse()
+    async deleteRole(@Param('id') id: string): Promise<void> {
+        await this.roleService.deleteRoleById(id);
     }
 }
