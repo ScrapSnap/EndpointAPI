@@ -44,4 +44,10 @@ export class ScheduleService {
   async findScheduleByFrequency(frequency: string): Promise<Schedule[]> {
     return this.scheduleModel.find({ frequency }).exec();
   }
+
+  async replaceAllSchedules(schedules: CreateScheduleDto[]): Promise<any> {
+    await this.scheduleModel.deleteMany().exec();
+    await this.scheduleModel.insertMany(schedules);
+    return this.scheduleModel.find().exec();
+  }
 }
