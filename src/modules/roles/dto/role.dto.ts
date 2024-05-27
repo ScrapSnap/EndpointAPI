@@ -17,6 +17,9 @@ export class RoleDto extends PickType(Role, ['_id', 'name', 'permissions'] as co
     @IsNotEmpty()
     permissions: number[]
 
+    @ApiProperty()
+    isDefault: boolean
+
     constructor(args?: Partial<RoleDto>) {
         super();
         Object.assign(this, args);

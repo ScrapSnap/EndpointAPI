@@ -35,6 +35,10 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
+  async deleteUser(id: string): Promise<User | null> {
+    return this.userModel.findByIdAndDelete(id).exec();
+  }
+
   async initDefaultUserWithRole(): Promise<void> {
     const userCount = await this.userModel.countDocuments().exec();
     if (userCount > 0) {
@@ -42,18 +46,26 @@ export class UserService {
       return;
     }
 
-    const role = new Role();
-    role.name = 'Admin';
-    role.permissions = getAllPermissions();
+    // Create default user role
+    const userRole = new Role();
+    userRole.name = 'User';
+    userRole.permissions = [];
+    userRole.isDefault = true;
+    await this.roleModel.create(userRole);
 
-    const createdRole = await this.roleModel.create(role);
+    // Create Admin role
+    const adminRole = new Role();
+    adminRole.name = 'Admin';
+    adminRole.permissions = getAllPermissions();
+    adminRole.isDefault = false;
+    const createdAdminRole = await this.roleModel.create(adminRole);
 
     const user = new User();
     user.firstname = 'Admin';
     user.lastname = 'Admin';
     user.email = 'admin@scrap-snap.com';
     user.password = await bcrypt.hash('demo', 10);
-    user.roleId = createdRole.id;
+    user.roleId = createdAdminRole.id;
     user.createdAt = new Date().toISOString();
     user.updatedAt = new Date().toISOString();
 

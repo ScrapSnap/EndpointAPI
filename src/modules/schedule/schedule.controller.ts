@@ -117,4 +117,13 @@ export class ScheduleController {
     const schedules = await this.scheduleService.findScheduleByFrequency(frequency);
     return schedules.map((schedule) => new ScheduleDto(schedule));
   }
+
+  @UseGuards(AuthGuard)
+  @Post('replace-all')
+  @ApiOperation({ summary: 'Replace all schedules' })
+  @ApiOkResponse()
+  async replaceAllSchedules(@Body() schedules: CreateScheduleDto[]): Promise<any> {
+    return this.scheduleService.replaceAllSchedules(schedules);
+  }
+
 }

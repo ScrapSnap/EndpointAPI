@@ -7,6 +7,7 @@ import { PermissionsGuard } from "../permissions/permission.guard";
 import { Role, RoleSchema } from "./schemas/role.schema";
 import { RoleService } from "./role.service";
 import { RoleController } from "./role.controller";
+import { User, UserSchema } from "../user/schemas/user.schema";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ dotenv.config();
         }),
         MongooseModule.forRoot(process.env.MONGODB_URI),
         MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     ],
     controllers: [RoleController],
     providers: [RoleService, AuthGuard, JwtService, PermissionsGuard],

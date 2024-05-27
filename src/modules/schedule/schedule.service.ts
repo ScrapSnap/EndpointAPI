@@ -22,7 +22,7 @@ export class ScheduleService {
   }
 
   async update(id: string, schedule: Schedule): Promise<Schedule | null> {
-    return this.scheduleModel.findByIdAndUpdate(id, schedule, { new: true }).exec();
+    return this.scheduleModel.findByIdAndUpdate(id, schedule).exec();
   }
 
   async delete(id: string): Promise<Schedule | null> {
@@ -43,5 +43,11 @@ export class ScheduleService {
 
   async findScheduleByFrequency(frequency: string): Promise<Schedule[]> {
     return this.scheduleModel.find({ frequency }).exec();
+  }
+
+  async replaceAllSchedules(schedules: CreateScheduleDto[]): Promise<any> {
+    await this.scheduleModel.deleteMany().exec();
+    await this.scheduleModel.insertMany(schedules);
+    return this.scheduleModel.find().exec();
   }
 }
