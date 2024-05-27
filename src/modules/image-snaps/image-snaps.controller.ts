@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Delete, UploadedFile, UseInterceptors, HttpStatus, Res, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, UploadedFile, UseInterceptors, HttpStatus, Res, Body, UseGuards, Logger } from '@nestjs/common';
 import { ImageSnapsService } from './image-snaps.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiResponse, ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
@@ -6,11 +6,13 @@ import { imageFileFilter } from '../utils/file-upload.utils';
 import { Response } from 'express';
 import { CreateImageSnapDto } from './dto/create-image-snap.dto';
 import { AuthGuard } from '../auth/auth.guard';
+import { extname } from 'path';
 
 @ApiTags('Image snaps')
 @ApiBearerAuth()
 @Controller('image-snaps')
 export class ImageSnapsController {
+  private readonly logger = new Logger(ImageSnapsController.name);
   constructor(private readonly imageSnapsService: ImageSnapsService) {}
 
   @UseGuards(AuthGuard)
@@ -29,19 +31,44 @@ export class ImageSnapsController {
   }
 
   @UseGuards(AuthGuard)
-  @Get('file/:bucketName/:fileName')
-  @ApiOperation({ summary: 'Get a file URL from a specific bucket' })
+  @Get('object/:bucketName/:fileName')
+  @ApiOperation({ summary: 'Get an object from a specific bucket' })
   @ApiParam({ name: 'bucketName', required: true, description: 'Name of the bucket' })
   @ApiParam({ name: 'fileName', required: true, description: 'Name of the file' })
-  @ApiResponse({ status: 200, description: 'File URL retrieved successfully' })
-  @ApiResponse({ status: 404, description: 'File not found' })
+  @ApiResponse({
+    status: 200,
+    description: 'Image retrieved successfully',
+    content: {
+      'image/jpeg': {},
+      'image/png': {},
+      'image/gif': {},
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Object not found' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  async getFileUrl(@Param('bucketName') bucketName: string, @Param('fileName') fileName: string, @Res() res: Response) {
+  async getImage(@Param('bucketName') bucketName: string,@Param('fileName') fileName: string, @Res() res: Response){
+    this.logger.log(`Getting object: ${bucketName}/${fileName}`);
     try {
-      const url = await this.imageSnapsService.getFileUrl(bucketName, fileName);
-      return res.status(HttpStatus.OK).json({ url });
+      const stream = await this.imageSnapsService.getImage(bucketName, fileName);
+      const fileExtension = extname(fileName).toLowerCase();
+
+      switch (fileExtension) {
+        case '.jpg':
+        case '.jpeg':
+          res.setHeader('Content-Type', 'image/jpeg');
+          break;
+        case '.png':
+          res.setHeader('Content-Type', 'image/png');
+          break;
+        case '.gif':
+          res.setHeader('Content-Type', 'image/gif');
+          break;
+        default:
+          res.setHeader('Content-Type', 'application/octet-stream');
+      }
+      stream.pipe(res);
     } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to get file URL' });
+      return { message: 'Failed to get object' };
     }
   }
 
