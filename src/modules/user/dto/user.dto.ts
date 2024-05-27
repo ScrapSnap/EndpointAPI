@@ -20,6 +20,9 @@ export class UserDto {
   @ApiResponseProperty()
   email: string;
 
+  @ApiResponseProperty()
+  roleId: string;
+
   constructor(args?: Partial<User>) {
     this._id = args._id;
     this.createdAt = args.createdAt;
@@ -27,5 +30,6 @@ export class UserDto {
     this.lastname = args.lastname;
     this.updatedAt = args.updatedAt;
     this.email = args.email;
+    this.roleId = args.roleId;
   }
 }

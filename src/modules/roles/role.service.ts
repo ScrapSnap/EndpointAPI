@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Role } from "./schemas/role.schema";
+import { User } from "../user/schemas/user.schema";
 
 @Injectable()
 export class RoleService {
-    constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
+    constructor(
+        @InjectModel(Role.name) private roleModel: Model<Role>,
+        @InjectModel(User.name) private userModel: Model<User>,
+    ) {}
 
     async getRoles(): Promise<Role[]> {
         return this.roleModel.find().exec();
@@ -22,5 +26,31 @@ export class RoleService {
 
     async getRoleById(id: string): Promise<Role | null> {
         return this.roleModel.findById(id).exec();
+    }
+
+    async getDefaultRole(): Promise<Role | null> {
+        const defaultRole = this.roleModel.findOne({ name: 'User' }).exec();
+        if (defaultRole) {
+            return defaultRole;
+        }
+
+        const role = new Role();
+        role.name = 'User';
+        role.permissions = [];
+        return this.createRole(role);
+    }
+
+    async hasPermission(userId: string, permission: number): Promise<boolean> {
+        const user = await this.userModel.findById(userId).exec();
+        if (!user) {
+            return false;
+        }
+
+        const role = await this.getRoleById(user.roleId);
+        if (!role) {
+            return false;
+        }
+
+        return role.permissions.includes(permission);
     }
 }

@@ -35,6 +35,10 @@ export class UserService {
     return this.userModel.find().exec();
   }
 
+  async deleteUser(id: string): Promise<User | null> {
+    return this.userModel.findByIdAndDelete(id).exec();
+  }
+
   async initDefaultUserWithRole(): Promise<void> {
     const userCount = await this.userModel.countDocuments().exec();
     if (userCount > 0) {

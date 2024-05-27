@@ -1,10 +1,10 @@
 import {
   BadRequestException,
   Body,
-  Controller,
+  Controller, Delete,
   Get, InternalServerErrorException, NotFoundException,
   Param,
-  Post, Put,
+  Post, Put, Req, UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -25,20 +25,24 @@ import { UpdateUserPasswordDto } from "./dto/update-user-password.dto";
 import { Permission } from "../roles/enums/permissions.enum";
 import { Permissions } from '../roles/enums/permissions.decorator';
 import { PermissionsGuard } from "../permissions/permission.guard";
+import { RoleService } from "../roles/role.service";
+import { Request } from "express";
 
 @Controller('users')
 @UseGuards(AuthGuard, PermissionsGuard)
 @ApiBearerAuth()
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+      private readonly userService: UserService,
+      private readonly roleService: RoleService,
+  ) {}
 
   @Post()
-  @Permissions(Permission.WRITE_USERS)
   @ApiOperation({ summary: 'Create user' })
   @ApiOkResponse({ type: UserDto })
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
-  async createUser(@Body() body: CreateUserDto): Promise<UserDto> {
+  async createUser(@Req() request: Request, @Body() body: CreateUserDto): Promise<UserDto> {
     if (!body) {
       throw new BadRequestException('User data is required.');
     }
@@ -50,13 +54,37 @@ export class UserController {
       throw new BadRequestException('Username already exists.');
     }
 
+    // If role is present, check permission, else assign default 'User' role
+    if (body.roleId && body.roleId !== '') {
+      const userId = request['user'].userId;
+      const hasPermission = await this.roleService.hasPermission(userId, Permission.WRITE_USERS);
+      if (!hasPermission) {
+        throw new UnauthorizedException('You do not have permission to assign roles.');
+      }
+    } else {
+      const defaultRole = await this.roleService.getDefaultRole();
+      body.roleId = defaultRole._id;
+    }
+
+    let hashed: string = null;
+    try {
+      hashed = await bcrypt.hash(body.password, 10);
+    } catch (error) {
+      console.log(error);
+    }
+
+    if (!hashed) {
+      throw new BadRequestException('Error hashing password');
+    }
+
     const user = new User();
     user.firstname = body.firstname;
     user.lastname = body.lastname;
     user.email = body.email;
-    user.password = await bcrypt.hash(user.password, 10);
+    user.password = hashed;
     user.createdAt = new Date().toISOString();
     user.updatedAt = new Date().toISOString();
+    user.roleId = body.roleId;
 
     const createdUser = await this.userService.createUser(user);
     return new UserDto(createdUser);
@@ -84,6 +112,21 @@ export class UserController {
 
     const updatedUser = await this.userService.updateUser(id, user);
     return new UserDto(updatedUser);
+  }
+
+  @Delete('/:id')
+  @Permissions(Permission.DELETE_USERS)
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  async deleteUser(@Param('id') id: string): Promise<boolean> {
+    const user = await this.userService.getUserById(id);
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
+    await this.userService.deleteUser(id);
+    return true;
   }
 
   @Put('/:id/password')
