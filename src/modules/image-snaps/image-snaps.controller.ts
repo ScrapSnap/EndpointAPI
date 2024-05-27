@@ -73,6 +73,71 @@ export class ImageSnapsController {
   }
 
   @UseGuards(AuthGuard)
+  @Get('image-base64/:bucketName/:fileName')
+  @ApiOperation({ summary: 'Get an object from a specific bucket as base64' })
+  @ApiParam({ name: 'bucketName', required: true, description: 'Name of the bucket' })
+  @ApiParam({ name: 'fileName', required: true, description: 'Name of the file' })
+  @ApiResponse({ status: 200, description: 'Image retrieved successfully as base64' })
+  @ApiResponse({ status: 404, description: 'Object not found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  async getImageBase64(@Param('bucketName') bucketName: string, @Param('fileName') fileName: string, @Res() res: Response) {
+    this.logger.log(`Getting object as base64: ${bucketName}/${fileName}`);
+    try {
+      const fileInfo = await this.imageSnapsService.getFileInfoOfFilesInBucket(bucketName);
+      const { userId, longitude, latitude, created } = fileInfo.find(file => file.fileName === fileName);
+      this.logger.log(`User ID: ${userId}, Longitude: ${longitude}, Latitude: ${latitude}`);
+      this.logger.log(`Getting address from coordinates: ${longitude}, ${latitude}`);
+      const address = await this.imageSnapsService.getAddressFromCoordinates(longitude, latitude);
+      this.logger.log(`Address: ${address}`);
+      const stream = await this.imageSnapsService.getImage(bucketName, fileName);
+      const chunks: Buffer[] = [];
+
+      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('end', () => {
+        const buffer = Buffer.concat(chunks);
+        const base64 = buffer.toString('base64');
+        const fileExtension = extname(fileName).toLowerCase();
+        let mimeType: string;
+
+        switch (fileExtension) {
+          case '.jpg':
+          case '.jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case '.png':
+            mimeType = 'image/png';
+            break;
+          case '.gif':
+            mimeType = 'image/gif';
+            break;
+          default:
+            mimeType = 'application/octet-stream';
+        }
+
+        res.json({ mimeType, base64, userId, longitude, latitude, created, address});
+      });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to get object' });
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('files/info/:bucketName')
+  @ApiOperation({ summary: 'Get file info of files inside a bucket' })
+  @ApiParam({ name: 'bucketName', required: true, description: 'Name of bucket' })
+  @ApiResponse({ status: 200, description: 'File info of files in bucket retrieved successfully' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  async getFileInformation(@Param('bucketName') bucketName: string, @Res() res: Response) {
+    try {
+      const fileInfo = await this.imageSnapsService.getFileInfoOfFilesInBucket(bucketName);
+      return res.status(HttpStatus.OK).json({ fileInfo });
+    } catch (error) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Failed to get file names' });
+    }
+  }
+
+
+  @UseGuards(AuthGuard)
   @Get('files/user/:userId')
   @ApiOperation({ summary: 'Get filenames and bucket names by user ID' })
   @ApiParam({ name: 'userId', required: true, description: 'ID of the user' })
