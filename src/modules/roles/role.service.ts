@@ -28,6 +28,14 @@ export class RoleService {
         return this.roleModel.findById(id).exec();
     }
 
+    async updateRoleById(id: string, role: Role): Promise<Role | null> {
+        return this.roleModel.findByIdAndUpdate(id, role).exec();
+    }
+
+    async deleteRoleById(id: string): Promise<Role | null> {
+        return this.roleModel.findByIdAndDelete(id).exec();
+    }
+
     async getDefaultRole(): Promise<Role | null> {
         const defaultRole = this.roleModel.findOne({ isDefault: true }).exec();
         if (defaultRole) {
