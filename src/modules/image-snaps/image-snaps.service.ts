@@ -50,20 +50,24 @@ export class ImageSnapsService {
         await imageSnap.save();
       } catch (error) {
         await this.minioClient.removeObject(bucketName, fileName);
-        throw new HttpException('Failed to save image snap', HttpStatus.INTERNAL_SERVER_ERROR);
+        this.logger.error(`Failed to save image snap: ${error}`);
+        throw new HttpException(`Failed to save image snap: ${error}`, HttpStatus.INTERNAL_SERVER_ERROR);
       }
 
       return {fileName: fileName, eTag: eTag.etag};
     } catch (error) {
-      throw new HttpException('File upload failed', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error(`File upload failed: ${error}`);
+      throw new HttpException(`File upload failed: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getFileUrl(bucketName: string, fileName: string) {
+  async getImage(bucketName: string, fileName: string) {
+    this.logger.log(`Getting object: ${bucketName}/${fileName}`);
     try {
-      return await this.minioClient.presignedUrl('GET', bucketName, fileName);
+      return await this.minioClient.getObject(bucketName, fileName);
     } catch (error) {
-      throw new HttpException('Failed to get file URL', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error(`Failed to get object: ${error}`);
+      throw new HttpException(`Failed to get object: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -72,14 +76,15 @@ export class ImageSnapsService {
       const buckets = await this.minioClient.listBuckets();
       return buckets.map(bucket => bucket.name);
     } catch (error) {
-      throw new HttpException('Failed to get bucket names', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error(`Failed to get bucket names: ${error}`);
+      throw new HttpException(`Failed to get bucket names: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async getAllFileNames(bucketName: string): Promise<{ status: number, fileNames?: string[], error?: string }> {
     const bucketExists = await this.minioClient.bucketExists(bucketName);
     if (!bucketExists) {
-      return { status: 404, error: 'Bucket not found' };
+      return { status: 404, error: `Bucket not found` };
     }
 
     try {
@@ -91,7 +96,8 @@ export class ImageSnapsService {
       }
       return { status: 200, fileNames };
     } catch (error) {
-      return { status: 500, error: 'Failed to get file names' };
+      this.logger.error(`Failed to get file names: ${error}`);
+      return { status: 500, error: `Failed to get file names: '${error}'` };
     }
   }
 
@@ -105,7 +111,8 @@ export class ImageSnapsService {
         
       }));
     } catch (error) {
-      throw new HttpException('Failed to get file names', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error(`Failed to get file names: ${error}`);
+      throw new HttpException(`Failed to get file names: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -114,7 +121,8 @@ export class ImageSnapsService {
       await this.minioClient.removeObject(bucketName, fileName);
       await this.imageSnapModel.deleteOne({fileName: fileName});
     } catch (error) {
-      throw new HttpException('Failed to delete file', HttpStatus.INTERNAL_SERVER_ERROR);
+      this.logger.error(`Failed to delete file: ${error}`);
+      throw new HttpException(`Failed to delete file: '${error}'`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
