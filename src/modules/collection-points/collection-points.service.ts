@@ -4,6 +4,7 @@ import { UpdateCollectionPointDto } from './dto/update-collection-point.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { CollectionPoint } from './schemas/collection-point.schema';
 import { Model } from 'mongoose';
+import { GarbageType } from "../utils/schemas/garbage-type.enum";
 
 @Injectable()
 export class CollectionPointsService {
@@ -51,5 +52,49 @@ export class CollectionPointsService {
         throw new NotFoundException(`CollectionPoint with ID ${id} not found`);
     }
     return deletedCollectionPoint;
+  }
+
+  async initDefaultCollectionPoints(): Promise<boolean> {
+    const count = await this.collectionPointModel.countDocuments().exec();
+    if (count > 0) {
+      return true;
+    }
+
+    let collectionPoint = new CollectionPoint();
+    collectionPoint.acceptsGargabeTypes = [GarbageType.PAPER, GarbageType.PLASTIC, GarbageType.GLASS, GarbageType.ORGANIC];
+    collectionPoint.location = 'Murska Sobota';
+    collectionPoint.latitude = 46.661362;
+    collectionPoint.longitude = 16.166201;
+    await this.collectionPointModel.create(collectionPoint);
+
+    collectionPoint = new CollectionPoint();
+    collectionPoint.acceptsGargabeTypes = [GarbageType.PAPER, GarbageType.PLASTIC, GarbageType.GLASS, GarbageType.METAL, GarbageType.ORGANIC];
+    collectionPoint.location = 'Maribor';
+    collectionPoint.latitude = 46.554649;
+    collectionPoint.longitude = 15.645881;
+    await this.collectionPointModel.create(collectionPoint);
+
+    collectionPoint = new CollectionPoint();
+    collectionPoint.acceptsGargabeTypes = [GarbageType.PAPER, GarbageType.PLASTIC, GarbageType.GLASS, GarbageType.METAL, GarbageType.ORGANIC];
+    collectionPoint.location = 'Ljubljana';
+    collectionPoint.latitude = 46.056946;
+    collectionPoint.longitude = 14.505751;
+    await this.collectionPointModel.create(collectionPoint);
+
+    collectionPoint = new CollectionPoint();
+    collectionPoint.acceptsGargabeTypes = [GarbageType.PAPER, GarbageType.PLASTIC, GarbageType.GLASS, GarbageType.METAL, GarbageType.ORGANIC];
+    collectionPoint.location = 'Koper';
+    collectionPoint.latitude = 45.548058;
+    collectionPoint.longitude = 13.730187;
+    await this.collectionPointModel.create(collectionPoint);
+
+    collectionPoint = new CollectionPoint();
+    collectionPoint.acceptsGargabeTypes = [GarbageType.PAPER, GarbageType.PLASTIC, GarbageType.GLASS, GarbageType.METAL, GarbageType.ORGANIC];
+    collectionPoint.location = 'Nova Gorica';
+    collectionPoint.latitude = 45.961416;
+    collectionPoint.longitude = 13.643745;
+    await this.collectionPointModel.create(collectionPoint);
+
+    return true;
   }
 }

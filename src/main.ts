@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { UserService } from "./modules/user/user.service";
 import * as dotenv from 'dotenv';
+import { CollectionPointsService } from './modules/collection-points/collection-points.service';
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ async function bootstrap() {
 
   const userService = app.get(UserService);
   await userService.initDefaultUserWithRole();
+
+  const collectionPointService = app.get(CollectionPointsService);
+  await collectionPointService.initDefaultCollectionPoints();
 
   await app.listen(3000);
 }
