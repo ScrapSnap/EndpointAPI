@@ -5,6 +5,7 @@ import { UserService } from "./modules/user/user.service";
 import * as dotenv from 'dotenv';
 import { CollectionPointsService } from './modules/collection-points/collection-points.service';
 import { StatsService } from './modules/stats/stats.service';
+import { ScheduleService } from './modules/schedule/schedule.service';
 
 dotenv.config();
 
@@ -32,6 +33,9 @@ async function bootstrap() {
 
   const statsService = app.get(StatsService);
   await statsService.initDefaultStats(adminUser._id);
+
+  const scheduleService = app.get(ScheduleService);
+  await scheduleService.initDefaultSchedules();
 
   await app.listen(3000);
 }
