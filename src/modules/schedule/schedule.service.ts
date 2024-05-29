@@ -71,7 +71,7 @@ export class ScheduleService {
       "Novo gorica",
       "Koper",
     ]
-  
+
     for (let i = 0; i < 5; i++) {
         let Schedule = new CreateScheduleDto();
 
@@ -80,10 +80,7 @@ export class ScheduleService {
 
         let frequencyIndex = Math.floor(Math.random() * frequencySize);
         let frequency = frequencyValues[frequencyIndex] as Frequency;
-
-        //console.log(`garbageTypeIndex: ${garbageTypeIndex}, garbageType: ${garbageType}`);
-        //console.log(`frequencyIndex: ${frequencyIndex}, frequency: ${frequency}`);
-
+        
         function getRandomDate(start: Date, end: Date): Date {
             return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
         }
