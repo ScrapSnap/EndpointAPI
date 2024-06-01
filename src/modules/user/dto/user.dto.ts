@@ -33,6 +33,7 @@ export class UserDto {
     this.lastname = args.lastname;
     this.updatedAt = args.updatedAt;
     this.email = args.email;
+    this.location = args.location;
     this.roleId = args.roleId;
   }
 }
