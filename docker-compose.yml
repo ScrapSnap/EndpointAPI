@@ -6,7 +6,18 @@ services:
       - "3000:3000"
     environment:
       MONGODB_URI: mongodb://mongodb:27017/endpoint-api-db
-
+      JWT_SECRET: ${JWT_SECRET}
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      GEOCODE_API_KEY: ${GEOCODE_API_KEY}
+  
   mongodb:
     image: mongo:latest
     volumes:
@@ -33,7 +44,8 @@ services:
       context: ../ScrapSnapWEB
       dockerfile: Dockerfile
     environment:
-      VITE_API_BASE_URL: http://localhost:3000
+      VITE_API_BASE_URL: http://endpoint-api:3000
+      VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN}
     ports:
       - "80:80"
 
