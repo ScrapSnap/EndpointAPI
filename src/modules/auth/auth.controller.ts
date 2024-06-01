@@ -69,6 +69,7 @@ export class AuthController {
     user.firstname = body.firstname;
     user.lastname = body.lastname;
     user.email = body.email;
+    user.location = body.location;
     user.password = hashed;
     user.createdAt = new Date().toISOString();
     user.updatedAt = new Date().toISOString();

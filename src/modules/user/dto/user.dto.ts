@@ -21,6 +21,9 @@ export class UserDto {
   email: string;
 
   @ApiResponseProperty()
+  location: string;
+
+  @ApiResponseProperty()
   roleId: string;
 
   constructor(args?: Partial<User>) {

@@ -35,4 +35,9 @@ export class SubscriptionsController {
     const { userId, title, message } = body;
     return this.subscriptionService.sendNotificationToUser(userId, title, message);
   }
+
+  @Post('notifyUsers')
+  async sendNotificationToUsersTest(@Body() body: { userIds: string[], title: string, message: string }) {
+    return this.subscriptionService.checkAndNotifyUsersGarbageCollection();
+  }
 }

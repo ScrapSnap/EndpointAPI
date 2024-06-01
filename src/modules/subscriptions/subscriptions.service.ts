@@ -2,8 +2,11 @@ import {Injectable, InternalServerErrorException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Subscription } from './schemas/subscription.schema';
+import { Cron } from '@nestjs/schedule';
 import * as webpush from 'web-push';
 import * as dotenv from 'dotenv';
+import { Schedule } from "../schedule/schemas/schedule.schema";
+import { User } from "../user/schemas/user.schema";
 
 dotenv.config();
 
@@ -16,8 +19,9 @@ webpush.setVapidDetails(
 @Injectable()
 export class SubscriptionsService {
   constructor(
-    @InjectModel(Subscription.name)
-    private subscriptionModel: Model<Subscription>
+    @InjectModel(Subscription.name) private subscriptionModel: Model<Subscription>,
+    @InjectModel(Schedule.name) private scheduleModel: Model<Schedule>,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
   async create(subscription: Subscription): Promise<Subscription> {
@@ -73,5 +77,61 @@ export class SubscriptionsService {
 
     await Promise.all(sendPromises);
     return true;
+  }
+
+  @Cron('0 16 * * *') // Runs every day at 16 PM
+  async userGarbageCollectionNotifier() {
+    await this.checkAndNotifyUsersGarbageCollection()
+  }
+
+  async checkAndNotifyUsersGarbageCollection() {
+    // get all schedules for tomorrow
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const schedules = await this.scheduleModel.find({
+        date: {
+            $gte: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()),
+            $lt: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate() + 1),
+        }
+    }).exec();
+
+    const sendPromises = [];
+
+    for (const schedule of schedules) {
+      const users = await this.userModel.find({ location: schedule.location }).exec();
+      if (!users || !users.length) {
+        continue;
+      }
+
+      const userSubscriptions = await this.subscriptionModel.find({ userId: { $in: users.map(user => user.id) } }).exec();
+      if (!userSubscriptions || !userSubscriptions.length) {
+          continue;
+      }
+
+      // get only unique subscriptions per userId
+      const uniqueUserSubscriptions = [];
+      const userIds = [];
+      for (const subscription of userSubscriptions) {
+          if (!userIds.includes(subscription.userId)) {
+              userIds.push(subscription.userId);
+              uniqueUserSubscriptions.push(subscription);
+          }
+      }
+
+      const notificationPayload = {
+        notification: {
+          title: 'Don\'t forget to take out the trash today!',
+          body: schedule.garbageType + ' garbage collection is scheduled for tomorrow',
+          icon: 'icons/icon-64x64.png',
+        },
+      };
+
+      sendPromises.push(uniqueUserSubscriptions.map(subscription => {
+        return webpush.sendNotification(subscription, JSON.stringify(notificationPayload));
+      }));
+    }
+
+    await Promise.all(sendPromises);
   }
 }
