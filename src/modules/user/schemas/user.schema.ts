@@ -27,6 +27,9 @@ export class User {
   email: string;
 
   @Prop({ type: String, required: true })
+  location: string;
+
+  @Prop({ type: String, required: true })
   roleId: string;
 }
 

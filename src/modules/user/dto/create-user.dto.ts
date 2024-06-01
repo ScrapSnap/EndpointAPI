@@ -7,6 +7,7 @@ export class CreateUserDto extends PickType(User, [
   'lastname',
   'password',
   'email',
+  'location',
   'roleId',
 ]) {
   @ApiProperty()
@@ -23,6 +24,9 @@ export class CreateUserDto extends PickType(User, [
 
   @ApiProperty()
   email: string;
+
+  @ApiProperty()
+  location: string;
 
   @ApiProperty()
   roleId: string;

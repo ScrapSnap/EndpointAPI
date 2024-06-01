@@ -64,6 +64,7 @@ export class UserService {
     user.firstname = 'Admin';
     user.lastname = 'Admin';
     user.email = 'admin@scrap-snap.com';
+    user.location = 'Maribor';
     user.password = await bcrypt.hash('demo', 10);
     user.roleId = createdAdminRole.id;
     user.createdAt = new Date().toISOString();

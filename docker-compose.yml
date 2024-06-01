@@ -1,3 +1,4 @@
+name: scrap-snap
 services:
   endpoint-api:
     build: .

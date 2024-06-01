@@ -35,4 +35,14 @@ export class SubscriptionsController {
     const { userId, title, message } = body;
     return this.subscriptionService.sendNotificationToUser(userId, title, message);
   }
+
+  @Post('notify-users')
+  async sendScheduleNotificationToUsers(@Body() body: { userIds: string[], title: string, message: string }) {
+    return this.subscriptionService.checkAndNotifyUsersGarbageCollection();
+  }
+
+  @Post('notify-user')
+  async sendScheduleNotificationToUser(@Body() body: { userId: string }) {
+    return this.subscriptionService.checkAndNotifyUserGarbageCollection(body.userId);
+  }
 }

@@ -4,6 +4,8 @@ import { AppModule } from './app.module';
 import { UserService } from "./modules/user/user.service";
 import * as dotenv from 'dotenv';
 import { CollectionPointsService } from './modules/collection-points/collection-points.service';
+import { StatsService } from './modules/stats/stats.service';
+import { ScheduleService } from './modules/schedule/schedule.service';
 
 dotenv.config();
 
@@ -26,6 +28,14 @@ async function bootstrap() {
 
   const collectionPointService = app.get(CollectionPointsService);
   await collectionPointService.initDefaultCollectionPoints();
+
+  const adminUser = await userService.getUserByEmail('admin@scrap-snap.com');
+
+  const statsService = app.get(StatsService);
+  await statsService.initDefaultStats(adminUser._id);
+
+  const scheduleService = app.get(ScheduleService);
+  await scheduleService.initDefaultSchedules();
 
   await app.listen(3000);
 }
