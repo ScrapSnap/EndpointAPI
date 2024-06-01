@@ -84,6 +84,52 @@ export class SubscriptionsService {
     await this.checkAndNotifyUsersGarbageCollection()
   }
 
+  async checkAndNotifyUserGarbageCollection(userId: string) {
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new InternalServerErrorException('User not found');
+    }
+
+    const subscriptions = await this.subscriptionModel.find({ userId }).exec();
+    if (!subscriptions || !subscriptions.length) {
+      throw new InternalServerErrorException('User has no subscriptions');
+    }
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // get schedule for tomorrow by user location
+    const schedules = await this.scheduleModel.find({
+        location: user.location,
+        date: {
+            $gte: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate()),
+            $lt: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate() + 1),
+        }
+    }).exec();
+
+    if (!schedules || !schedules.length) {
+      throw new InternalServerErrorException('No garbage collection scheduled for tomorrow');
+    }
+
+    for (const schedule of schedules) {
+      const notificationPayload = {
+        notification: {
+          title: 'Don\'t forget to take out the trash today!',
+          body: schedule.garbageType + ' garbage collection is scheduled for tomorrow',
+          icon: 'icons/icon-64x64.png',
+        },
+      };
+
+      const sendPromises = subscriptions.map(subscription => {
+        return webpush.sendNotification(subscription, JSON.stringify(notificationPayload));
+      });
+
+      await Promise.all(sendPromises);
+    }
+
+    return true;
+  }
+
   async checkAndNotifyUsersGarbageCollection() {
     // get all schedules for tomorrow
     const tomorrow = new Date();
