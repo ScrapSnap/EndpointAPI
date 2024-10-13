@@ -37,6 +37,7 @@ async function bootstrap() {
   const scheduleService = app.get(ScheduleService);
   await scheduleService.initDefaultSchedules();
 
-  await app.listen(3000);
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
 }
-bootstrap().then(r => console.log('Server is running on port 3000'));
+bootstrap().then(r => console.log('Server is running on port ' + (process.env.PORT || 3000)));
